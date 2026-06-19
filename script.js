@@ -374,10 +374,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (item.tidalID) {
             modalMediaContainer.innerHTML = `
-                <div style="margin-top: 25px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.6);">
-                    <iframe src="https://embed.tidal.com/tracks/${item.tidalID}" width="480" height="120" allow="encrypted-media; fullscreen; 
-                    clipboard-write https://embed.tidal.com; web-share" sandbox="allow-same-origin allow-scripts allow-forms allow-popups 
-                    allow-popups-to-escape-sandbox" style="color-scheme: light dark" title="TIDAL Embed Player" />
+                <div class="tidal-player-container">
+                    <iframe src="https://embed.tidal.com/tracks/${item.tidalID}"  frameborder="0" 
+            allowfullscreen 
+            allow="clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+        </iframe>
                 </div>
             `;
         } 
