@@ -668,3 +668,38 @@ footer { margin-top: auto; color: var(--text-muted); font-size: 0.9rem; font-fam
     user-select: none; 
     transition: filter 0.8s ease, opacity 0.8s ease;
 }
+
+
+/* =========================================================
+   REPRODUCTOR DE MÚSICA RESPONSIVO (TIDAL / SPOTIFY)
+   ========================================================= */
+.tidal-player-container {
+    position: relative;
+    width: 100%;
+    /* Altura ideal para reproductores tipo "card" en móviles */
+    padding-top: 100px; 
+    margin: 20px 0;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-subtle);
+}
+
+/* Forzamos al iframe a llenar el contenedor perfectamente sin desbordarse */
+.tidal-player-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Ajuste específico por si usas el formato de reproductor extendido (tipo playlist o tracks grandes) */
+@media (max-width: 480px) {
+    .tidal-player-container {
+        /* Si notas que el reproductor de TIDAL aún se corta abajo en pantallas muy chicas, 
+           puedes aumentar ligeramente este valor a 120px o 150px según el tipo de embed */
+        padding-top: 96px; 
+    }
+}
