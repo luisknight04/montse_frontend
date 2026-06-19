@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camino al Aniversario</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+    <div class="film-grain"></div>
+    <div id="ambient-particles"></div>
+
+    <div id="login-overlay" class="login-overlay">
+        <div class="login-card">
+            <h2 class="login-title">Acceso Restringido</h2>
+            <p class="login-subtitle">Por favor, introduce la llave para leer las páginas.</p>
+            
+            <div class="pin-container">
+                <input type="password" id="secret-pin" class="pin-input" placeholder="••••" maxlength="4">
+                <p class="pin-hint">Pista: El día que nuestra historia comenzó a escribirse y compartimos el primer bocado (DDMM).</p>
+            </div>
+            
+            <button id="unlock-btn" class="spin-btn pulse-btn" style="width: 100%; margin-top: 25px;">Desbloquear</button>
+            <p id="login-error" class="login-error"></p>
+        </div>
+    </div>
+
+    <button class="menu-toggle-btn" id="menu-toggle-btn">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="var(--accent-color)"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    </button>
+
+    <header>
+        <h1>El Día Tan Esperado</h1>
+        <p>18 capítulos de espera para nuestro primer aniversario.</p>
+        
+        <div class="countdown-container">
+            <div class="countdown-box">
+                <span class="number" id="timer-days">00</span>
+                <span class="label">Días</span>
+            </div>
+            <div class="countdown-divider">:</div>
+            <div class="countdown-box">
+                <span class="number" id="timer-hours">00</span>
+                <span class="label">Horas</span>
+            </div>
+            <div class="countdown-divider">:</div>
+            <div class="countdown-box">
+                <span class="number" id="timer-minutes">00</span>
+                <span class="label">Min</span>
+            </div>
+            <div class="countdown-divider">:</div>
+            <div class="countdown-box">
+                <span class="number" id="timer-seconds">00</span>
+                <span class="label">Seg</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h2 class="section-title">Nuestro Calendario de Amor y Pasión</h2>
+        <div class="calendar-grid" id="calendar-grid">
+            </div>
+    </main>
+
+    <div class="modal-overlay" id="content-modal">
+        <div class="modal-wrapper">
+            <button class="modal-close-btn" id="close-modal-btn">×</button>
+            <div class="modal-header-info" id="modal-day-title">CAPÍTULO 00</div>
+            <div class="modal-body">
+                <div id="modal-quote-container"></div>
+                <p class="modal-message" id="modal-day-message"></p>
+                <div id="modal-media-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="coupon-drawer" id="coupon-drawer">
+        <div class="drawer-header">
+            <h3>Tus Cupones Ganados</h3>
+            <button class="close-drawer-btn" id="close-drawer-btn">×</button>
+        </div>
+        <div class="drawer-content" id="drawer-content">
+            </div>
+    </div>
+
+    <div id="notification-container" class="notification-container"></div>
+
+    <footer>
+        Escrito con tinta, café y amor • 2026
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
