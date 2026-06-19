@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2.5 INTEGRACIÓN IA (Llamada segura al Backend Propio)
     // =========================================================
     async function fetchAIMessage() {
-        const BACKEND_URL = 'https://montse-backend.onrender.com';
+        const BACKEND_URL = 'https://montse-backend.onrender.com/api/gemini';
         
         try {
             const response = await fetch(BACKEND_URL);
