@@ -4,7 +4,7 @@ const TARGET_DATE = new Date("2026-10-28T00:00:00").getTime(); // Fecha de Anive
 const weeklyData = [
     { 
         week: 1, 
-        unlockDate: "2026-06-22", 
+        unlockDate: "2026-06-19", 
         title: "Capítulo 01",
         quote: "«He luchado en vano. Ya no puedo más. Soy incapaz de contener mis sentimientos. Permítame que le diga que la admiro y la amo apasionadamente». Fitzwilliam Darcy",
         message: "Oficialmente empieza nuestra cuenta regresiva hacia nuestro primer aniversario amor mío. Sé que estos meses separados se sienten como una eternidad, pero quise dejarte este pequeño rincón nuestro.\n\nSirve una taza de café, imagina que estoy ahí contigo del otro lado de la mesa, y recuerda que cada día que tachamos en el calendario es un día menos para volver a vernos. Te extraño a cada instante mi vida.",
