@@ -14,8 +14,18 @@ const weeklyData = [
     },
     { 
         week: 2, 
-        unlockDate: "2026-06-29", 
+        unlockDate: "2026-06-20", 
         title: "Capítulo 02",
+        quote: null,
+        message: "«Toco tu boca, con un dedo toco el borde de tu boca, voy dibujándola como si saliera de mi mano, como si por primera vez tu boca se entreabriera, y me basta cerrar los ojos para deshacerlo todo y recomenzar, hago nacer cada vez la boca que deseo, la boca que mi mano elige y te dibuja en la cara, una boca elegida entre todas, con soberana libertad elegida por mí para dibujarla con mi mano por tu cara, y que por un azar que no busco comprender coincide exactamente con tu boca que sonríe por debajo de la que mi mano te dibuja». Julio Cortázar",
+        spotifyId: null,
+        hasRoulette: true,
+        hasScratchCard: false
+    },
+    { 
+        week: 3, 
+        unlockDate: "2026-07-06", 
+        title: "Capítulo 03",
         quote: null,
         message: "Sobrevivimos una semana más. Hoy estuviste en mi mente como cada día y a cada momento, escuchando esta canción no pude hacer otra cosa más que extrañarte.",
         tidalID: "629019",
@@ -23,23 +33,13 @@ const weeklyData = [
         hasScratchCard: false
     },
     { 
-        week: 3, 
-        unlockDate: "2026-07-06", 
-        title: "Capítulo 03",
+        week: 4, 
+        unlockDate: "2026-07-13", 
+        title: "Capítulo 04",
         quote: "«Daría todo lo que tengo porque fueras tú quien esté sobre la mesa. Pasearía mi boca por tus muslos, para después meter mi lengua en tu interior y hacerte mía». Eric Zimmerman",
         message: "Llevamos semanas sin tocarnos y extraño cada centímetro de tu piel, extraño sentir tu interior, tener tu sabor en mi boca y escuchar tu placer.\n\nPara esta semana te tengo un pequeño reto: la próxima vez que estemos juntos, quiero que me confieses al oído cuál fue exactamente el momento en que más nerviosa te he puesto. Yo ya tengo mi respuesta preparada, y te aseguro que involucra esa mirada tuya que tanto me vuelve loco.",
         spotifyId: null,
         hasRoulette: false,
-        hasScratchCard: false
-    },
-    { 
-        week: 4, 
-        unlockDate: "2026-07-13", 
-        title: "Capítulo 04",
-        quote: null,
-        message: "«Toco tu boca, con un dedo toco el borde de tu boca, voy dibujándola como si saliera de mi mano, como si por primera vez tu boca se entreabriera, y me basta cerrar los ojos para deshacerlo todo y recomenzar, hago nacer cada vez la boca que deseo, la boca que mi mano elige y te dibuja en la cara, una boca elegida entre todas, con soberana libertad elegida por mí para dibujarla con mi mano por tu cara, y que por un azar que no busco comprender coincide exactamente con tu boca que sonríe por debajo de la que mi mano te dibuja». Julio Cortázar",
-        spotifyId: null,
-        hasRoulette: true,
         hasScratchCard: false
     },
     { 
