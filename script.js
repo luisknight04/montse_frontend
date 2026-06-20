@@ -399,8 +399,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // LA LISTA MAESTRA DE PREMIOS
             const masterPrizes = [
-                "Masaje de cuerpo completo a poca luz 🕯️", 
-                "Te invito un buen café y postre ☕",      
+                "Masaje de cuerpo completo a la luz de las velas 🕯️", 
+                "Ganaste un rico café y un postre delicioso ☕",      
                 "Hoy tienes el control total de mi 😈", 
                 "Noche de películas donde tú eliges todo 🎬",  
                 "Cumplimos esa fantasía pendiente 🔥",      
