@@ -14,7 +14,7 @@ const weeklyData = [
     },
     { 
         week: 2, 
-        unlockDate: "2026-06-20", 
+        unlockDate: "2026-06-19", 
         title: "Capítulo 02",
         quote: null,
         message: "«Toco tu boca, con un dedo toco el borde de tu boca, voy dibujándola como si saliera de mi mano, como si por primera vez tu boca se entreabriera, y me basta cerrar los ojos para deshacerlo todo y recomenzar, hago nacer cada vez la boca que deseo, la boca que mi mano elige y te dibuja en la cara, una boca elegida entre todas, con soberana libertad elegida por mí para dibujarla con mi mano por tu cara, y que por un azar que no busco comprender coincide exactamente con tu boca que sonríe por debajo de la que mi mano te dibuja». Julio Cortázar",
