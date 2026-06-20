@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         toast.innerHTML = `<span class="ai-icon">✨</span><p>${aiText || "La cerradura ha cedido. Bienvenida, Mi Amor."}</p>`;
         
         // Temporizador de 10 segundos
-        let autoClose = setTimeout(closeToast, 10000);
+        let autoClose = setTimeout(closeToast, 15000);
 
         // Función que destruye el mensaje y limpia los eventos
         function closeToast() {
