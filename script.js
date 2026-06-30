@@ -405,9 +405,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const resultDisplay = document.getElementById('roulette-result');
             
             const masterPrizes = [
-                "Masaje de cuerpo completo a poca luz 🕯️", 
-                "Te invito un buen café y postre ☕",      
-                "Hoy tienes el control total de mi 😈", 
+                "Masaje de cuerpo completo a la luz de las velas 🕯️", 
+                "Te invito un rico café y tu postre favorito ☕",      
+                "Hoy tienes el control total de mi en la cama 😈", 
                 "Noche de películas donde tú eliges todo 🎬",  
                 "Cumplimos esa fantasía pendiente 🔥",      
                 "Cita sorpresa organizada 100% por mí 🍷"    
