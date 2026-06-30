@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================
     // 0. ESTADO GLOBAL Y CONEXIÓN A MONGODB (RENDER)
     // =========================================================
-    const BACKEND_URL = 'https://TU-URL-DE-RENDER.onrender.com'; // ⚠️ CAMBIA ESTO POR TU URL REAL
+    const BACKEND_URL = 'https://montse-backend.onrender.com'; // ⚠️ CAMBIA ESTO POR TU URL REAL
     
     let appState = {
         openedWeeks: [],
