@@ -1,6 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // =========================================================
+    // 0. ESTADO GLOBAL Y CONEXIÓN A MONGODB (RENDER)
+    // =========================================================
+    const BACKEND_URL = 'https://TU-URL-DE-RENDER.onrender.com'; // ⚠️ CAMBIA ESTO POR TU URL REAL
+    
+    let appState = {
+        openedWeeks: [],
+        wonPrizes: {}
+    };
+
+    async function saveProgressToCloud() {
+        try {
+            await fetch(`${BACKEND_URL}/api/sync`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    openedWeeks: appState.openedWeeks,
+                    wonPrizes: appState.wonPrizes
+                })
+            });
+            updateDrawer(); // Refresca el panel lateral visualmente
+        } catch (error) {
+            console.error("Error guardando en la bóveda:", error);
+        }
+    }
+
+    // =========================================================
     // 1. SISTEMA DE NOTIFICACIONES PERSONALIZADAS (TOAST)
     // =========================================================
     function showToast(message) {
@@ -22,37 +48,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // GENERADOR DE PARTÍCULAS AMBIENTALES
     // =========================================================
     const particlesContainer = document.getElementById('ambient-particles');
-    const particleCount = 40; // Cantidad de partículas flotando al mismo tiempo
+    const particleCount = 40; 
 
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.classList.add('particle');
         
-        // Tamaños aleatorios sutiles (entre 2px y 5px)
         const size = Math.random() * 3 + 2;
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
-        
-        // Posición horizontal aleatoria (0% a 100% del ancho de la pantalla)
         particle.style.left = `${Math.random() * 100}vw`;
-        
-        // Duración de la animación súper lenta y relajante (entre 12s y 30s)
         particle.style.animationDuration = `${Math.random() * 18 + 12}s`;
-        
-        // Retraso aleatorio para que no salgan todas de golpe
         particle.style.animationDelay = `${Math.random() * 20}s`;
         
         particlesContainer.appendChild(particle);
     }
 
     // =========================================================
-    // 2.5 INTEGRACIÓN IA (Llamada segura al Backend Propio)
+    // 2.5 INTEGRACIÓN IA (Llamada segura al Backend)
     // =========================================================
     async function fetchAIMessage() {
-        const BACKEND_URL = 'https://montse-backend.onrender.com/api/bienvenida';
-        
         try {
-            const response = await fetch(BACKEND_URL);
+            const response = await fetch(`${BACKEND_URL}/api/bienvenida`);
             if (!response.ok) throw new Error('Error en la conexión con el servidor');
             
             const data = await response.json();
@@ -79,23 +96,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const aiText = await fetchAIMessage();
         toast.innerHTML = `<span class="ai-icon">✨</span><p>${aiText || "La cerradura ha cedido. Bienvenida, Mi Amor."}</p>`;
         
-        // Temporizador de 10 segundos
         let autoClose = setTimeout(closeToast, 15000);
 
-        // Función que destruye el mensaje y limpia los eventos
         function closeToast() {
             toast.classList.remove('show');
             document.removeEventListener('click', clickOutsideHandler);
             clearTimeout(autoClose);
         }
 
-        // Función intermediaria para el clic
         function clickOutsideHandler(e) {
             closeToast();
         }
 
-        // Retrasamos 100ms la activación del clic global para evitar que 
-        // el clic original del botón "Desbloquear" lo cierre accidentalmente al instante.
         setTimeout(() => {
             document.addEventListener('click', clickOutsideHandler);
         }, 100);
@@ -111,15 +123,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const CORRECT_PIN = "0710"; 
 
-    unlockBtn.addEventListener('click', () => {
+    unlockBtn.addEventListener('click', async () => {
         const enteredPin = pinInput.value;
         
         if (enteredPin === CORRECT_PIN) {
             loginError.innerText = "";
             loginOverlay.classList.add('hidden'); 
             
-            // Disparamos la notificación central de IA en lugar del toast básico
             showCenterWelcomeToast();
+
+            // DESCARGAMOS EL PROGRESO DESDE MONGODB
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/sync`);
+                const data = await response.json();
+                if (data) {
+                    appState.openedWeeks = data.openedWeeks || [];
+                    appState.wonPrizes = data.wonPrizes || {};
+                }
+            } catch (err) {
+                console.error("Fallo carga inicial de la bóveda", err);
+            }
+            
+            updateDrawer(); // Pintar el cajón de cupones con lo que haya en la nube
+
+            // Actualizar visualmente las tarjetas que ya están abiertas según la base de datos
+            document.querySelectorAll('.day-card').forEach(card => {
+                const weekNum = parseInt(card.dataset.week);
+                if (appState.openedWeeks.includes(weekNum)) {
+                    card.classList.add('opened');
+                }
+            });
 
             gsap.to(".day-card, .finale-card", {
                 opacity: 1,
@@ -141,14 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') unlockBtn.click();
     });
     
-    
     // =========================================================
     // 3. FUEGOS ARTIFICIALES (PALETA TERCIOPELO Y VINO)
     // =========================================================
     let fireworksFired = false;
 
     function triggerFireworks() {
-        // Duración del espectáculo: 10 segundos
         const duration = 20 * 1000;
         const animationEnd = Date.now() + duration;
         const defaults = { 
@@ -156,32 +187,18 @@ document.addEventListener('DOMContentLoaded', () => {
             spread: 360, 
             ticks: 60, 
             zIndex: 2000,
-            // NUEVOS COLORES: Rubor, Vino Tinto, Carmesí Oscuro y Blanco Rosáceo
             colors: ['#dca4ad', '#2e181f', '#5c1827', '#f5ecee'] 
         };
 
-        function randomInRange(min, max) {
-            return Math.random() * (max - min) + min;
-        }
+        function randomInRange(min, max) { return Math.random() * (max - min) + min; }
 
         const interval = setInterval(function() {
             const timeLeft = animationEnd - Date.now();
-
-            if (timeLeft <= 0) {
-                return clearInterval(interval);
-            }
+            if (timeLeft <= 0) return clearInterval(interval);
 
             const particleCount = 50 * (timeLeft / duration);
-            
-            // Disparos desde la izquierda y derecha imitando pirotecnia cruzada
-            confetti(Object.assign({}, defaults, { 
-                particleCount, 
-                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
-            }));
-            confetti(Object.assign({}, defaults, { 
-                particleCount, 
-                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
-            }));
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
         }, 250);
     }
 
@@ -196,7 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.countdown-container').innerHTML = 
                 "<div style='font-family:var(--font-title); color:var(--accent-color); font-size:1.8rem; text-align:center; width:100%; padding:10px; font-style: italic;'>El tiempo se ha cumplido. Feliz Aniversario.</div>";
             
-            // Disparar fuegos artificiales solo la primera vez que se renderiza el 0
             if (!fireworksFired) {
                 fireworksFired = true;
                 triggerFireworks();
@@ -215,12 +231,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('timer-seconds').innerText = String(seconds).padStart(2, '0');
     }
     
-    // Llamamos el update inmediatamente y luego cada segundo
     updateCountdown(); 
     setInterval(updateCountdown, 1000);
 
-
-    
     // =========================================================
     // 5. LÓGICA DEL MENÚ LATERAL (BÓVEDA DE CUPONES)
     // =========================================================
@@ -230,10 +243,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const drawerContent = document.getElementById('drawer-content');
 
     function updateDrawer() {
-        let wonPrizes = JSON.parse(localStorage.getItem('won_prizes')) || {};
         drawerContent.innerHTML = "";
         
-        const prizeKeys = Object.keys(wonPrizes);
+        const prizeKeys = Object.keys(appState.wonPrizes);
         if (prizeKeys.length === 0) {
             drawerContent.innerHTML = "<p class='empty-drawer'>Aún no tienes cupones. Gira la ruleta en las semanas correspondientes.</p>";
             return;
@@ -242,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         prizeKeys.forEach(week => {
             const coupon = document.createElement('div');
             coupon.classList.add('coupon-item');
-            coupon.innerHTML = `<strong>Capítulo ${week}:</strong><br>${wonPrizes[week]}`;
+            coupon.innerHTML = `<strong>Capítulo ${week}:</strong><br>${appState.wonPrizes[week]}`;
             drawerContent.appendChild(coupon);
         });
     }
@@ -261,18 +273,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridContainer = document.getElementById('calendar-grid');
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0); 
-    let openedWeeks = JSON.parse(localStorage.getItem('opened_weeks')) || [];
 
     weeklyData.sort((a, b) => a.week - b.week).forEach(item => {
         const card = document.createElement('div');
         
         const targetUnlock = new Date(item.unlockDate + "T00:00:00");
         const isUnlocked = todayDate >= targetUnlock;
-        const isOpened = openedWeeks.includes(item.week);
+        
+        card.dataset.week = item.week; // Referencia clave para Mongo
 
         if (item.week === 18) {
-            card.classList.add('day-card'); 
-            card.classList.add('finale-card'); 
+            card.classList.add('day-card', 'finale-card'); 
             card.innerHTML = `
                 <div class="day-number">EL GRAN DÍA</div>
                 <div class="status-indicator">${isUnlocked ? '🥂' : '🔒'}</div>
@@ -287,11 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isUnlocked) {
             card.classList.add('unlocked');
-            if (isOpened) card.classList.add('opened');
-
-            card.addEventListener('click', () => {
-                openModal(item, card);
-            });
+            card.addEventListener('click', () => { openModal(item, card); });
         } else {
             card.addEventListener('click', () => {
                 showToast(`Las páginas aún están en blanco. Podrás leerlas el ${item.unlockDate}.`);
@@ -372,17 +379,17 @@ document.addEventListener('DOMContentLoaded', () => {
             typeWriterEffect(modalMessage, item.message, 25);
         }
 
+        // A. Integración Responsiva TIDAL
         if (item.tidalID) {
             modalMediaContainer.innerHTML = `
                 <div class="tidal-player-container">
                     <iframe src="https://embed.tidal.com/tracks/${item.tidalID}"  frameborder="0" 
-            allowfullscreen 
-            allow="clipboard-write; encrypted-media; fullscreen; picture-in-picture">
-        </iframe>
+                    allowfullscreen allow="clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+                    </iframe>
                 </div>
             `;
         } 
-        // C. Inyectar Ruleta Interactiva Dinámica (Elimina premios ganados)
+        // B. Ruleta
         else if (item.hasRoulette) {
             modalMediaContainer.innerHTML = `
                 <div class="roulette-wrapper">
@@ -397,32 +404,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const wheel = document.getElementById('roulette-wheel');
             const resultDisplay = document.getElementById('roulette-result');
             
-            // LA LISTA MAESTRA DE PREMIOS
             const masterPrizes = [
-                "Masaje de cuerpo completo a la luz de las velas 🕯️", 
-                "Ganaste un rico café y un postre delicioso ☕",      
+                "Masaje de cuerpo completo a poca luz 🕯️", 
+                "Te invito un buen café y postre ☕",      
                 "Hoy tienes el control total de mi 😈", 
                 "Noche de películas donde tú eliges todo 🎬",  
                 "Cumplimos esa fantasía pendiente 🔥",      
                 "Cita sorpresa organizada 100% por mí 🍷"    
             ];
 
-            // Paleta de colores Dark Academia para repintar la ruleta
-            const rouletteColors = ['var(--bg-card-hover)', '#8B5A2B', '#3a2e22', '#A85751', '#5e3a23', '#2a231d'];
+            const rouletteColors = ['var(--bg-card-hover)', 'var(--bg-card-locked)', 'var(--accent-glow)'];
 
-            // Verificamos qué premios ya ganó Montse
-            let wonPrizes = JSON.parse(localStorage.getItem('won_prizes')) || {};
-            let wonPrizeValues = Object.values(wonPrizes);
-            
-            // FILTRAR PREMIOS: Dejamos solo los que NO están en la bóveda
+            let wonPrizeValues = Object.values(appState.wonPrizes);
             let availablePrizes = masterPrizes.filter(prize => !wonPrizeValues.includes(prize));
             
-            // Sistema de seguridad: Por si pone más tarjetas de ruleta que premios disponibles
             if (availablePrizes.length === 0) {
                 availablePrizes = ["Comodín: Tú eliges el premio de hoy 👑"];
             }
 
-            // MATEMÁTICA VISUAL: Dibujar la ruleta dinámicamente con los premios restantes
             const numSegments = availablePrizes.length;
             const degreesPerSegment = 360 / numSegments;
             let gradientStops = [];
@@ -434,14 +433,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 gradientStops.push(`${color} ${startDegree}deg ${endDegree}deg`);
             }
             
-            // Pintamos la ruleta inyectando el CSS directamente desde JavaScript
             wheel.style.background = `conic-gradient(${gradientStops.join(', ')})`;
             
-            // Lógica de bloqueo si ya giró esta semana
-            if (wonPrizes[item.week]) {
+            if (appState.wonPrizes[item.week]) {
                 spinBtn.disabled = true;
                 spinBtn.innerText = "Ruleta Bloqueada";
-                resultDisplay.innerText = "Ya ganaste: " + wonPrizes[item.week];
+                resultDisplay.innerText = "Ya ganaste: " + appState.wonPrizes[item.week];
                 resultDisplay.classList.add('show');
                 wheel.style.transform = `rotate(1080deg)`; 
             } else {
@@ -462,7 +459,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         const normalizedRotation = currentRotation % 360;
                         const pointerDegree = (360 - normalizedRotation) % 360;
                         
-                        // MATEMÁTICA DE PREMIOS: Calcular qué rebanada ganó con los grados nuevos
                         const prizeIndex = Math.floor(pointerDegree / degreesPerSegment);
                         const wonPrize = availablePrizes[prizeIndex];
                         
@@ -470,16 +466,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         resultDisplay.classList.add('show');
                         spinBtn.innerText = "¡Cupón Guardado!";
                         
-                        // Guardar en memoria y actualizar panel
-                        wonPrizes[item.week] = wonPrize;
-                        localStorage.setItem('won_prizes', JSON.stringify(wonPrizes));
-                        updateDrawer(); 
+                        // GUARDAMOS EN LA NUBE
+                        appState.wonPrizes[item.week] = wonPrize;
+                        saveProgressToCloud(); 
                     }, 4000); 
                 });
             }
         }
-
-        // D. Inyectar Rasca y Gana interactivo
+        // C. Rasca y Gana interactivo
         else if (item.hasScratchCard) {
             modalMediaContainer.innerHTML = `
                 <div style="text-align:center; font-style:italic; margin-top:20px; color:var(--text-muted); font-size: 0.95rem;">
@@ -491,18 +485,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const container = document.getElementById('scratch-game-container');
             const resultDisplay = document.getElementById('scratch-result');
-            let wonPrizes = JSON.parse(localStorage.getItem('won_prizes')) || {};
 
-            // Verificamos si ya jugó esta semana
-            if (wonPrizes[item.week]) {
+            if (appState.wonPrizes[item.week]) {
                 container.innerHTML = `
                     <p style="color: var(--accent-color); font-family: var(--font-title); font-size: 1.3rem; text-align: center; width: 100%;">
-                        Ya revelaste tu destino: <br><strong style="color: var(--text-main);">${wonPrizes[item.week]}</strong>
+                        Ya revelaste tu destino: <br><strong style="color: var(--text-main);">${appState.wonPrizes[item.week]}</strong>
                     </p>`;
             } else {
-                // Mezclamos los premios al azar para que no sepa dónde está cada uno
                 const shuffledPrizes = item.scratchPrizes.sort(() => 0.5 - Math.random());
-                let isGameLocked = false; // Bandera para bloquear las demás tarjetas
+                let isGameLocked = false; 
 
                 shuffledPrizes.forEach((prize) => {
                     const wrapper = document.createElement('div');
@@ -512,11 +503,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     prizeText.classList.add('scratch-prize');
                     prizeText.innerText = prize;
 
-                    // ... [código anterior de creación del wrapper y prizeText] ...
-
                     const canvas = document.createElement('canvas');
                     canvas.classList.add('scratch-canvas');
-                    // Nuevas medidas verticales
                     canvas.width = 160;
                     canvas.height = 240;
 
@@ -525,15 +513,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     container.appendChild(wrapper);
 
                     const ctx = canvas.getContext('2d');
-                    
-                    // Pintamos el nuevo recuadro vertical
                     ctx.fillStyle = '#3a2e22'; 
                     ctx.fillRect(0, 0, 160, 240);
                     
                     ctx.fillStyle = '#d4af37'; 
                     ctx.font = 'italic 18px Playfair Display';
                     ctx.textAlign = 'center';
-                    // Centramos el texto "Raspar" en las nuevas medidas
                     ctx.fillText('Raspar', 80, 125); 
 
                     let isDrawing = false;
@@ -553,13 +538,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const scratchEnd = () => { isDrawing = false; };
 
                     const scratch = (e) => {
-                        // Bloquear los demás en el instante que raspa la primera vez
                         if(scratchCount === 150) {
-                            const allCanvases = document.querySelectorAll('.scratch-canvas');
-                            allCanvases.forEach(c => {
-                                if(c !== canvas) {
-                                    c.classList.add('locked-card');
-                                }
+                            document.querySelectorAll('.scratch-canvas').forEach(c => {
+                                if(c !== canvas) c.classList.add('locked-card');
                             });
                         }
 
@@ -571,73 +552,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         ctx.globalCompositeOperation = 'destination-out';
                         ctx.beginPath();
-                        ctx.arc(x, y, 22, 0, Math.PI * 2); // Pincel un poco más grande
+                        ctx.arc(x, y, 22, 0, Math.PI * 2); 
                         ctx.fill();
 
                         scratchCount++;
 
-                        // LÓGICA DEL 30%: Evaluamos los píxeles cada 4 movimientos para no saturar la memoria
                         if(scratchCount % 4 === 0 && !isGameLocked) {
                             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                             const pixels = imageData.data;
                             let transparent = 0;
                             
-                            // Revisamos el canal Alpha de cada píxel
                             for(let i = 3; i < pixels.length; i += 4) {
                                 if(pixels[i] < 128) transparent++;
                             }
                             
                             const percent = (transparent / (pixels.length / 4)) * 100;
 
-                            // Si raspó más del 30%, revelamos todo el cupón
-                            // Si raspó más del 30%, revelamos todo
                             if(percent > 30) {
                                 isGameLocked = true;
                                 
-                                // 1. Desvanecemos el canvas de la tarjeta ganadora
                                 canvas.style.opacity = '0'; 
                                 setTimeout(() => canvas.remove(), 500); 
 
-                                // 2. Buscamos todas las tarjetas para revelar las perdedoras
-                                const allWrappers = document.querySelectorAll('.scratch-card-wrapper');
-                                allWrappers.forEach(w => {
+                                document.querySelectorAll('.scratch-card-wrapper').forEach(w => {
                                     const c = w.querySelector('.scratch-canvas');
                                     const pText = w.querySelector('.scratch-prize');
                                     
-                                    // Si NO es la tarjeta que ella raspó (es decir, perdió esta opción)
                                     if(c !== canvas) {
                                         if(c) {
-                                            c.style.opacity = '0'; // Quitamos la pintura
+                                            c.style.opacity = '0'; 
                                             setTimeout(() => c.remove(), 500);
                                         }
-                                        if(pText) {
-                                            // Aplicamos el desenfoque al texto revelado
-                                            pText.classList.add('lost-prize');
-                                        }
+                                        if(pText) pText.classList.add('lost-prize');
                                     }
                                 });
 
-                                // Mostramos el mensaje de éxito
                                 resultDisplay.innerText = "¡Destino Revelado!";
                                 resultDisplay.classList.add('show');
 
-                                // Guardamos en memoria
-                                wonPrizes[item.week] = prize;
-                                localStorage.setItem('won_prizes', JSON.stringify(wonPrizes));
-                                updateDrawer();
+                                // GUARDAMOS EN LA NUBE
+                                appState.wonPrizes[item.week] = prize;
+                                saveProgressToCloud();
                             }
                         }
                     };
 
-                    // ... [resto de los EventListeners táctiles y de ratón iguales] ...
-
-                    // Eventos para Ratón (PC)
                     canvas.addEventListener('mousedown', scratchStart);
                     canvas.addEventListener('mousemove', scratchMove);
                     canvas.addEventListener('mouseup', scratchEnd);
                     canvas.addEventListener('mouseleave', scratchEnd);
-
-                    // Eventos para Táctil (Celular)
                     canvas.addEventListener('touchstart', scratchStart, {passive: true});
                     canvas.addEventListener('touchmove', scratchMove, {passive: true});
                     canvas.addEventListener('touchend', scratchEnd);
@@ -650,10 +613,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         modal.classList.add('active');
 
-        if (!openedWeeks.includes(item.week)) {
-            openedWeeks.push(item.week);
-            localStorage.setItem('opened_weeks', JSON.stringify(openedWeeks));
+        // SI LA TARJETA NO ESTABA ABIERTA, LA ABRIMOS Y GUARDAMOS EN LA NUBE
+        if (!appState.openedWeeks.includes(item.week)) {
+            appState.openedWeeks.push(item.week);
             cardElement.classList.add('opened');
+            saveProgressToCloud(); 
         }
     }
 
