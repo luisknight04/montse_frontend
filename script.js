@@ -284,7 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             drawerContent.innerHTML = `
                 <div class="quiz-container">
-                    <span class="quiz-badge">${quiz.categoria}</span>
                     <p class="quiz-question">${quiz.pregunta}</p>
                     <div class="quiz-options">
                         ${quiz.opciones.map((opcion, index) => `
@@ -309,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (quiz.categoria.includes("Romántica")) {
                         comentario = "✨ El hilo rojo se tensa. Tu corazón y el mío vibran exactamente en la misma frecuencia, Mi Vida.";
                     } else if (quiz.categoria.includes("Divertida")) {
-                        comentario = "🥂 ¡Cómplices perfectos! Nadie en este mundo entiende nuestra locura compartida mejor que tú.";
+                        comentario = "🥂 ¡Cómplices perfectos! Nadie en este mundo entiende nuestra conexión mejor que tú.";
                     } else {
                         comentario = "🔥 Una respuesta fascinante y atrevida... Has encendido una llama que arderá en nuestro próximo encuentro.";
                     }
