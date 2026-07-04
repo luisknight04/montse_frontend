@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function renderQuizInterface() {
+async function renderQuizInterface() {
         drawerContent.innerHTML = "<p class='quiz-loading'>Consultando al Oráculo el dilema de hoy...</p>";
         
         try {
@@ -282,6 +282,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error();
             const quiz = await response.json();
 
+            // CASO A: YA JUGÓ HOY (Muestra la pregunta y resalta su respuesta)
+            if (quiz.alreadyPlayed) {
+                drawerContent.innerHTML = `
+                    <div class="quiz-container">
+                        <p class="quiz-question">${quiz.pregunta}</p>
+                        <div class="quiz-options">
+                            <button class="quiz-opt-btn selected" disabled style="font-style: italic;">
+                                Tu elección: "${quiz.respuestaElegida}"
+                            </button>
+                        </div>
+                        <p style="color: var(--text-muted); font-size:0.85rem; font-style:italic; text-align:center; margin-top:10px;">
+                            Tu respuesta ha quedado grabada en la nube del destino. Vuelve mañana para un nuevo enigma.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            // CASO B: DÍA NUEVO (Flujo normal)
             drawerContent.innerHTML = `
                 <div class="quiz-container">
                     <p class="quiz-question">${quiz.pregunta}</p>
@@ -294,27 +313,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            // Añadir eventos a los botones de opciones recién creados
             document.querySelectorAll('.quiz-opt-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+                btn.addEventListener('click', async (e) => {
                     const botones = document.querySelectorAll('.quiz-opt-btn');
-                    botones.forEach(b => b.disabled = true); // Bloqueamos para evitar doble clic
+                    botones.forEach(b => b.disabled = true); 
                     e.target.classList.add('selected');
 
+                    const elegidaTexto = e.target.innerText; // Capturamos el texto de la opción pulsada
                     const feedback = document.getElementById('quiz-feedback');
                     
-                    // Comentarios pícaros/tiernos preestablecidos según la categoría
                     let comentario = "";
                     if (quiz.categoria.includes("Romántica")) {
                         comentario = "✨ El hilo rojo se tensa. Tu corazón y el mío vibran exactamente en la misma frecuencia, Mi Vida.";
                     } else if (quiz.categoria.includes("Divertida")) {
                         comentario = "🥂 ¡Cómplices perfectos! Nadie en este mundo entiende nuestra conexión mejor que tú.";
                     } else {
-                        comentario = "🔥 Una respuesta fascinante y atrevida... Has encendido una llama que arderá en nuestro próximo encuentro.";
+                        comentario = "🔥 Una respuesta fascinante... Has encendido una llama que arderá con fuerza en nuestro próximo encuentro.";
                     }
 
                     feedback.innerText = comentario;
                     feedback.classList.add('show');
+
+                    // MANDAMOS TODO AL BACKEND PARA CONGELAR EL DÍA
+                    try {
+                        await fetch(`${BACKEND_URL}/api/quiz-completar`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                categoria: quiz.categoria,
+                                pregunta: quiz.pregunta,
+                                respuesta: elegidaTexto // <-- Enviamos el texto de su respuesta
+                            })
+                        });
+                    } catch (err) {
+                        console.error("No se pudo salvar la sesión del quiz", err);
+                    }
                 });
             });
 
