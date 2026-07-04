@@ -132,6 +132,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             showCenterWelcomeToast();
 
+            // NUEVO: REGISTRAR LA VISITA EN LA BASE DE DATOS (SILENCIOSO)
+            try {
+                fetch(`${BACKEND_URL}/api/visita`, { method: 'POST' });
+            } catch (err) {
+                console.error("No se pudo registrar la visita", err);
+            }
+
             // DESCARGAMOS EL PROGRESO DESDE MONGODB
             try {
                 const response = await fetch(`${BACKEND_URL}/api/sync`);
@@ -235,32 +242,111 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateCountdown, 1000);
 
     // =========================================================
-    // 5. LÓGICA DEL MENÚ LATERAL (BÓVEDA DE CUPONES)
+    // 5. LÓGICA DEL MENÚ LATERAL Y QUIZ DEL DÍA
     // =========================================================
     const drawer = document.getElementById('coupon-drawer');
     const openDrawerBtn = document.getElementById('menu-toggle-btn');
     const closeDrawerBtn = document.getElementById('close-drawer-btn');
     const drawerContent = document.getElementById('drawer-content');
 
+    const navCouponsBtn = document.getElementById('nav-coupons-btn');
+    const navQuizBtn = document.getElementById('nav-quiz-btn');
+
+    let currentDrawerTab = 'coupons'; // Estado interno: 'coupons' o 'quiz'
+
     function updateDrawer() {
         drawerContent.innerHTML = "";
         
-        const prizeKeys = Object.keys(appState.wonPrizes);
-        if (prizeKeys.length === 0) {
-            drawerContent.innerHTML = "<p class='empty-drawer'>Aún no tienes cupones. Gira la ruleta en las semanas correspondientes.</p>";
-            return;
+        if (currentDrawerTab === 'coupons') {
+            const prizeKeys = Object.keys(appState.wonPrizes);
+            if (prizeKeys.length === 0) {
+                drawerContent.innerHTML = "<p class='empty-drawer'>Aún no tienes cupones. Gira la ruleta en las semanas correspondientes.</p>";
+                return;
+            }
+            prizeKeys.forEach(week => {
+                const coupon = document.createElement('div');
+                coupon.classList.add('coupon-item');
+                coupon.innerHTML = `<strong>Capítulo ${week}:</strong><br>${appState.wonPrizes[week]}`;
+                drawerContent.appendChild(coupon);
+            });
+        } else if (currentDrawerTab === 'quiz') {
+            renderQuizInterface();
         }
+    }
 
-        prizeKeys.forEach(week => {
-            const coupon = document.createElement('div');
-            coupon.classList.add('coupon-item');
-            coupon.innerHTML = `<strong>Capítulo ${week}:</strong><br>${appState.wonPrizes[week]}`;
-            drawerContent.appendChild(coupon);
+    async function renderQuizInterface() {
+        drawerContent.innerHTML = "<p class='quiz-loading'>Consultando al Oráculo el dilema de hoy...</p>";
+        
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/quiz-diario`);
+            if (!response.ok) throw new Error();
+            const quiz = await response.json();
+
+            drawerContent.innerHTML = `
+                <div class="quiz-container">
+                    <span class="quiz-badge">${quiz.categoria}</span>
+                    <p class="quiz-question">${quiz.pregunta}</p>
+                    <div class="quiz-options">
+                        ${quiz.opciones.map((opcion, index) => `
+                            <button class="quiz-opt-btn" data-index="${index}">${opcion}</button>
+                        `).join('')}
+                    </div>
+                    <div id="quiz-feedback" class="quiz-feedback"></div>
+                </div>
+            `;
+
+            // Añadir eventos a los botones de opciones recién creados
+            document.querySelectorAll('.quiz-opt-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const botones = document.querySelectorAll('.quiz-opt-btn');
+                    botones.forEach(b => b.disabled = true); // Bloqueamos para evitar doble clic
+                    e.target.classList.add('selected');
+
+                    const feedback = document.getElementById('quiz-feedback');
+                    
+                    // Comentarios pícaros/tiernos preestablecidos según la categoría
+                    let comentario = "";
+                    if (quiz.categoria.includes("Romántica")) {
+                        comentario = "✨ El hilo rojo se tensa. Tu corazón y el mío vibran exactamente en la misma frecuencia, Mi Vida.";
+                    } else if (quiz.categoria.includes("Divertida")) {
+                        comentario = "🥂 ¡Cómplices perfectos! Nadie en este mundo entiende nuestra locura compartida mejor que tú.";
+                    } else {
+                        comentario = "🔥 Una respuesta fascinante y atrevida... Has encendido una llama que arderá en nuestro próximo encuentro.";
+                    }
+
+                    feedback.innerText = comentario;
+                    feedback.classList.add('show');
+                });
+            });
+
+        } catch (err) {
+            drawerContent.innerHTML = "<p class='quiz-error'>Las estrellas se han nublado. Intenta consultar el quiz más tarde.</p>";
+        }
+    }
+
+    if (navCouponsBtn && navQuizBtn) {
+        navCouponsBtn.addEventListener('click', () => {
+            navCouponsBtn.classList.add('active');
+            navQuizBtn.classList.remove('active');
+            currentDrawerTab = 'coupons';
+            updateDrawer();
+        });
+
+        navQuizBtn.addEventListener('click', () => {
+            navQuizBtn.classList.add('active');
+            navCouponsBtn.classList.remove('active');
+            currentDrawerTab = 'quiz';
+            updateDrawer();
         });
     }
 
     if(openDrawerBtn && closeDrawerBtn && drawer) {
         openDrawerBtn.addEventListener('click', () => {
+            currentDrawerTab = 'coupons'; // Abrir por defecto en cupones
+            if(navCouponsBtn && navQuizBtn) {
+                navCouponsBtn.classList.add('active');
+                navQuizBtn.classList.remove('active');
+            }
             updateDrawer();
             drawer.classList.add('open');
         });
