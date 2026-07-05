@@ -276,17 +276,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function renderQuizInterface() {
         drawerContent.innerHTML = "<p class='quiz-loading'>Consultando al Oráculo el dilema de hoy...</p>";
+        const usuario = esPrueba ? '?user=luis_pruebas' : '?user=montse_0710';
         
         try {
-            const response = await fetch(`${BACKEND_URL}/api/quiz-diario`);
+            const response = await fetch(`${BACKEND_URL}/api/quiz-diario${usuario}`);
             if (!response.ok) throw new Error();
             const quiz = await response.json();
 
-            // CASO A: YA JUGÓ HOY (Muestra la pregunta y resalta su respuesta)
+            // Creamos el HTML del termómetro de la racha de forma dinámica
+            const racha = quiz.currentStreak || 0;
+            let iconoFuego = racha > 0 ? "🔥" : "❄️";
+            let mensajeRacha = racha > 0 ? `¡Llevas ${racha} días manteniendo la sintonía!` : "¡Inicia tu racha de amor hoy!";
+
+            const termometroHTML = `
+                <div class="quiz-streak-thermometer">
+                    <span class="streak-icon">${iconoFuego}</span>
+                    <div class="streak-details">
+                        <span class="streak-count">Racha Activa: ${racha} días</span>
+                        <span class="streak-msg">${mensajeRacha}</span>
+                    </div>
+                </div>
+            `;
+
+            // CASO A: YA JUGÓ HOY
             if (quiz.alreadyPlayed) {
                 drawerContent.innerHTML = `
                     <div class="quiz-container">
-                        <p class="quiz-question">${quiz.pregunta}</p>
+                        ${termometroHTML} <p class="quiz-question" style="margin-top:15px;">${quiz.pregunta}</p>
                         <div class="quiz-options">
                             <button class="quiz-opt-btn selected" disabled style="font-style: italic;">
                                 Tu elección: "${quiz.respuestaElegida}"
@@ -300,10 +316,10 @@ async function renderQuizInterface() {
                 return;
             }
 
-            // CASO B: DÍA NUEVO (Flujo normal)
+            // CASO B: DÍA NUEVO
             drawerContent.innerHTML = `
                 <div class="quiz-container">
-                    <p class="quiz-question">${quiz.pregunta}</p>
+                    ${termometroHTML} <p class="quiz-question" style="margin-top:15px;">${quiz.pregunta}</p>
                     <div class="quiz-options">
                         ${quiz.opciones.map((opcion, index) => `
                             <button class="quiz-opt-btn" data-index="${index}">${opcion}</button>
@@ -313,18 +329,19 @@ async function renderQuizInterface() {
                 </div>
             `;
 
+            // Lógica de los botones de opciones...
             document.querySelectorAll('.quiz-opt-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     const botones = document.querySelectorAll('.quiz-opt-btn');
                     botones.forEach(b => b.disabled = true); 
                     e.target.classList.add('selected');
 
-                    const elegidaTexto = e.target.innerText; // Capturamos el texto de la opción pulsada
+                    const elegidaTexto = e.target.innerText;
                     const feedback = document.getElementById('quiz-feedback');
                     
                     let comentario = "";
                     if (quiz.categoria.includes("Romántica")) {
-                        comentario = "✨ El hilo rojo se tensa. Tu corazón y el mío vibran exactamente en la misma frecuencia, Mi Vida.";
+                        comentario = "✨ El hilo rojo se tensa. Tu corazón y el mío vibran en la misma frecuencia, Mi Vida.";
                     } else if (quiz.categoria.includes("Divertida")) {
                         comentario = "🥂 ¡Cómplices perfectos! Nadie en este mundo entiende nuestra conexión mejor que tú.";
                     } else {
@@ -334,17 +351,25 @@ async function renderQuizInterface() {
                     feedback.innerText = comentario;
                     feedback.classList.add('show');
 
-                    // MANDAMOS TODO AL BACKEND PARA CONGELAR EL DÍA
+                    // MANDAMOS AL BACKEND Y REVISAMOS SI HUBO PREMIO DE RACHA
                     try {
-                        await fetch(`${BACKEND_URL}/api/quiz-completar`, {
+                        const res = await fetch(`${BACKEND_URL}/api/quiz-completar${usuario}`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ 
                                 categoria: quiz.categoria,
                                 pregunta: quiz.pregunta,
-                                respuesta: elegidaTexto // <-- Enviamos el texto de su respuesta
+                                respuesta: elegidaTexto 
                             })
                         });
+                        const dataRes = await res.json();
+
+                        // Si el backend responde que desbloqueó un premio por hito de racha, le avisamos con un Toast descampanante
+                        if (dataRes.premioDesbloqueado) {
+                            setTimeout(() => {
+                                showToast(`🎉 ¡LOGRO DE RACHA EXTRAORDINARIO! Se ha desbloqueado un cupón secreto en tu panel.`);
+                            }, 1500);
+                        }
                     } catch (err) {
                         console.error("No se pudo salvar la sesión del quiz", err);
                     }
