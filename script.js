@@ -288,7 +288,23 @@ async function renderQuizInterface() {
             const respuestaElegida = quiz.respuestaElegida || "";
 
             let iconoFuego = racha > 0 ? "🔥" : "❄️";
-            let mensajeRacha = racha > 0 ? `¡Llevas ${racha} días manteniendo la sintonía!` : "¡Inicia tu racha de amor hoy!";
+            let mensajeRacha = "";
+
+            if (racha < 6) {
+                const faltan = 6 - racha;
+                mensajeRacha = `🎯 ¡Faltan ${faltan} ${faltan === 1 ? 'día' : 'días'} para tu primer Cupón Secreto!`;
+            } else if (racha < 15) {
+                const faltan = 15 - racha;
+                mensajeRacha = `🍿 ¡A ${faltan} ${faltan === 1 ? 'día' : 'días'} de desbloquear la Tarde de Películas!`;
+            } else if (racha < 25) {
+                const faltan = 25 - racha;
+                mensajeRacha = `🔥 ¡A ${faltan} ${faltan === 1 ? 'día' : 'días'} de desbloquear una Tarde de Pasión!`;
+            } else if (racha < 40) {
+                const faltan = 40 - racha;
+                mensajeRacha = `✨ ¡A solo ${faltan} ${faltan === 1 ? 'día' : 'días'} del Cupón de Cita Suprema!`;
+            } else {
+                mensajeRacha = "👑 ¡Racha Máxima! Has desbloqueado todos los misterios del Oráculo.";
+            }
 
             const termometroHTML = `
                 <div class="quiz-streak-thermometer">
@@ -355,7 +371,7 @@ async function renderQuizInterface() {
 
                     // MANDAMOS AL BACKEND Y REVISAMOS SI HUBO PREMIO DE RACHA
                     try {
-                        const res = await fetch(`${BACKEND_URL}/api/quiz-completar${usuario}`, {
+                        const res = await fetch(`${BACKEND_URL}/api/quiz-completar`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ 
