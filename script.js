@@ -276,10 +276,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function renderQuizInterface() {
         drawerContent.innerHTML = "<p class='quiz-loading'>Consultando al Oráculo el dilema de hoy...</p>";
-        const usuario = esPrueba ? '?user=luis_pruebas' : '?user=montse_0710';
         
         try {
-            const response = await fetch(`${BACKEND_URL}/api/quiz-diario${usuario}`);
+            const response = await fetch(`${BACKEND_URL}/api/quiz-diario`);
             if (!response.ok) throw new Error("Error en la respuesta del servidor");
             const quiz = await response.json();
 
