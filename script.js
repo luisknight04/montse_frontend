@@ -280,11 +280,14 @@ async function renderQuizInterface() {
         
         try {
             const response = await fetch(`${BACKEND_URL}/api/quiz-diario${usuario}`);
-            if (!response.ok) throw new Error();
+            if (!response.ok) throw new Error("Error en la respuesta del servidor");
             const quiz = await response.json();
 
-            // Creamos el HTML del termómetro de la racha de forma dinámica
+            // Blindaje: Aseguramos que existan valores por defecto por si el backend no los manda
             const racha = quiz.currentStreak || 0;
+            const pregunta = quiz.pregunta || "¡Ya respondiste el dilema de hoy!";
+            const respuestaElegida = quiz.respuestaElegida || "";
+
             let iconoFuego = racha > 0 ? "🔥" : "❄️";
             let mensajeRacha = racha > 0 ? `¡Llevas ${racha} días manteniendo la sintonía!` : "¡Inicia tu racha de amor hoy!";
 
@@ -302,10 +305,11 @@ async function renderQuizInterface() {
             if (quiz.alreadyPlayed) {
                 drawerContent.innerHTML = `
                     <div class="quiz-container">
-                        ${termometroHTML} <p class="quiz-question" style="margin-top:15px;">${quiz.pregunta}</p>
+                        ${termometroHTML}
+                        <p class="quiz-question" style="margin-top:15px;">${pregunta}</p>
                         <div class="quiz-options">
                             <button class="quiz-opt-btn selected" disabled style="font-style: italic;">
-                                Tu elección: "${quiz.respuestaElegida}"
+                                Tu elección: "${respuestaElegida}"
                             </button>
                         </div>
                         <p style="color: var(--text-muted); font-size:0.85rem; font-style:italic; text-align:center; margin-top:10px;">
@@ -315,7 +319,6 @@ async function renderQuizInterface() {
                 `;
                 return;
             }
-
             // CASO B: DÍA NUEVO
             drawerContent.innerHTML = `
                 <div class="quiz-container">
