@@ -842,3 +842,49 @@ footer { margin-top: auto; color: var(--text-muted); font-size: 0.9rem; font-fam
     font-style: italic;
     margin-top: 40px;
 }
+
+/* =========================================================
+   COMPONENTE: TERMÓMETRO DE RACHA (QUIZ)
+   ========================================================= */
+.quiz-streak-thermometer {
+    display: flex;
+    align-items: center;
+    background: rgba(33, 18, 22, 0.6); /* Borgoña oscuro translúcido */
+    border: 1px solid var(--border-subtle);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    box-shadow: 0 0 10px var(--accent-glow);
+    transition: transform 0.3s ease;
+}
+
+.quiz-streak-thermometer:hover {
+    transform: scale(1.02);
+}
+
+.streak-icon {
+    font-size: 1.8rem;
+    margin-right: 12px;
+    filter: drop-shadow(0 0 5px var(--accent-color));
+}
+
+.streak-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.streak-count {
+    font-family: var(--font-title);
+    font-weight: 600;
+    color: var(--accent-color); /* Oro Rosa */
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+
+.streak-msg {
+    font-family: var(--font-body);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-style: italic;
+    margin-top: 2px;
+}
