@@ -55,7 +55,7 @@ const weeklyData = [
     },
     { 
         week: 6, 
-        unlockDate: "2026-08-10", 
+        unlockDate: "2026-07-27", 
         title: "Capítulo 06",
         quote: null,
         message: "Llegamos al sexto capítulo y es hora de volver a jugar.\n\nComo lo prometido es deuda, aquí tienes tu segundo pase para la Ruleta. Tira de nuevo y suma un cupón más. Prepárate, porque pienso cumplirlos todos y cada uno de ellos sin excusas. Tu decidirás cual cumplir primero princesa",
@@ -65,7 +65,7 @@ const weeklyData = [
     },
     { 
         week: 7, 
-        unlockDate: "2026-08-17", 
+        unlockDate: "2026-08-03", 
         title: "Capítulo 07",
         quote: "«El amor es más sabio que la sabiduría.» — Umberto Eco",
         message: "Me encanta sumergirme en libros y película de misterios complicados.Pero si soy sincero, el enigma que más me gusta descifrar es ese que aparece en tu cara al estar junto a ti. Eres el único libro que quiero leer de principio a fin, una y otra vez. Ya quiero tenerte a mi lado para seguir investigando.",
@@ -75,7 +75,7 @@ const weeklyData = [
     },
     { 
         week: 8, 
-        unlockDate: "2026-07-27", 
+        unlockDate: "2026-08-10", 
         title: "Capítulo 08",
         quote: "«En mis sueños más inquietos, veo ese lugar...»",
         message: "Esta canción me hace recordar el primer beso que te di. Robert Smith dice que habla de esa sensación de besar a alguien hasta desmayarse de la emoción, y eso es exactamente lo que siento en cada momento juntos que pasamos. Eres mi pedacito de cielo en la Tierra. Escúchala pensando en nosotros como yo lo hago en ti.",
@@ -85,7 +85,7 @@ const weeklyData = [
     },
     { 
         week: 9, 
-        unlockDate: "2026-09-07", 
+        unlockDate: "2026-08-17", 
         title: "Capítulo 09",
         quote: "«No me extrañes, corazón... mejor ven y búscame en mi rincón.»",
         message: "Esta vez no giraremos una ruleta. Tienes tres opciones ocultas frente a ti.\n\nElige sabiamente y descubre lo que te espera.",
